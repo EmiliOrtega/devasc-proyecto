@@ -1,44 +1,45 @@
-import requests
 import json
+import requests
 
-def obtener_info_ip(ip):
-    url = f"http://ip-api.com/json/{ip}"
-    respuesta = requests.get(url)
-    return respuesta.json()
-
-def main():
+def solicitar_ips():
+    archivo_json = "resultados_ips.json"
     resultados = []
 
-    print("Consulta de IP pública (escribe 'exit' para salir)\n")
+    try:
+        with open(archivo_json, "r") as f:
+            resultados = json.load(f)
+    except FileNotFoundError:
+        pass
 
     while True:
-        ip = input("Ingresa una IP pública: ").strip()
+        ip = input("Ingresa una IP pública (o escribe 'exit' para salir): ")
         if ip.lower() == "exit":
             break
 
-        data = obtener_info_ip(ip)
+        url = f"http://ip-api.com/json/{ip}"
+        response = requests.get(url)
 
-        if data["status"] == "success":
-            info = {
-                "IP": ip,
-                "País": data.get("country"),
-                "Región": data.get("regionName"),
-                "ISP": data.get("isp"),
-                "Coordenadas": {
-                    "Latitud": data.get("lat"),
-                    "Longitud": data.get("lon")
+        if response.status_code == 200:
+            data = response.json()
+            if data["status"] == "success":
+                resultado = {
+                    "query": data["query"],
+                    "country": data["country"],
+                    "regionName": data["regionName"],
+                    "isp": data["isp"],
+                    "lat": data["lat"],
+                    "lon": data["lon"]
                 }
-            }
-
-            print(json.dumps(info, indent=4, ensure_ascii=False))
-            resultados.append(info)
+                resultados.append(resultado)
+                print(f"IP {ip} guardada.")
+            else:
+                print(f"Error: {data['message']}")
         else:
-            print(f"Error: {data.get('message', 'No se pudo consultar la IP')}")
-    
-    with open("resultados_ips.json", "w", encoding="utf-8") as archivo:
-        json.dump(resultados, archivo, indent=4, ensure_ascii=False)
+            print("No se pudo conectar con la API.")
 
-    print("\nConsulta finalizada. Resultados guardados en 'resultados_ips.json'.")
+    with open(archivo_json, "w") as f:
+        json.dump(resultados, f, indent=4)
 
-if __name__ == "__main__":
-    main()
+    print("Datos guardados en resultados_ips.json")
+
+solicitar_ips()
