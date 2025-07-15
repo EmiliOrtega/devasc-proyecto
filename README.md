@@ -1,6 +1,6 @@
 # Proyecto DEVASC - IP Lookup
 
-Este programa solicita IPs públicas, consulta sus datos desde ip-api.com y guarda los resultados en formato JSON.
+Este programa solicita IPs públicas, consulta sus datos desde ip-api.com y guarda los resultados en JSON.
 
 ## Tecnologías
 - Python 3
@@ -15,3 +15,4 @@ Este programa solicita IPs públicas, consulta sus datos desde ip-api.com y guar
     python ip_lookup.py
 
 3. Para salir del programa, escribe: exit
+
